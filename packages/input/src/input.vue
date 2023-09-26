@@ -430,9 +430,25 @@
     mounted() {
       this.setNativeInputValue();
       this.resizeTextarea();
+      this.lastWidth = undefined;
+      if (ResizeObserver) {
+        this.resizeObserver = new ResizeObserver((entries) => {
+          for (let entry of entries) {
+            if (this.lastWidth === undefined) {
+              this.lastWidth = entry.contentRect.width;
+            }
+            if (this.lastWidth !== entry.contentRect.width) {
+              this.resizeTextarea();
+            }
+          }
+        });
+        this.resizeObserver.observe(this.$refs.textarea);
+      }
       this.updateIconOffset();
     },
-
+    destroyed() {
+      this.resizeObserver && this.resizeObserver.disconnect();
+    },
     updated() {
       this.$nextTick(this.updateIconOffset);
     }
