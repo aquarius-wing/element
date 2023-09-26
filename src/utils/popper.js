@@ -727,6 +727,16 @@
             },
             bottom: function() {
                 var top = popper.top;
+                // here will make popper be more top
+                // but after preventOverflow, it will be flipped
+                // so when flipped top < 0, we don't need to flipped, so we don't need to be more top
+                // use `data.instance._reference.getBoundingClientRect().top` rather than `data.offsets.reference.top`
+                // because `data.offsets.reference.top` is the distance to the top of document
+                // not the distance to the top of viewport
+                const flippedTop = data.instance._reference.getBoundingClientRect().top - popper.height;
+                if (flippedTop < 0) {
+                    return { top: top };
+                }
                 if (popper.bottom > data.boundaries.bottom) {
                     top = Math.min(popper.top, data.boundaries.bottom - popper.height);
                 }
